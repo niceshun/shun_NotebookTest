@@ -1,3 +1,4 @@
+
 from flask import Flask, render_template, flash, redirect, url_for, session, request, logging
 from mysql_util_test import MysqlUtil
 from passlib.hash import sha256_crypt
@@ -18,7 +19,7 @@ def index():
         page = 1  # 默认设置页码为1
     # 分页查询
     # 从article表中提取数据，并按照时间降序排列
-    sql = f'SELECT * FROM articles ORDER BY create_date DESC LIMIT{(int(page)-1)*count},{count}'
+    sql = f'SELECT * FROM articles ORDER BY create_date DESC LIMIT {(int(page)-1)*count},{count}'
     articles = db.fetchall(sql)  # 获取多条记录
     # 遍历文章数据
     return render_template('home.html', articles=articles, page=int(page))  # 渲染模板
@@ -39,7 +40,7 @@ def article(id):
 # 用户登录
 @app.route('/login', methods=['GET','POST'])
 def login():
-    if logged_in in session:    # 如果用户已登录，直接跳转到控制台
+    if "logged_in" in session:    # 如果用户已登录，直接跳转到控制台
         return redirect(url_for("dashboard"))
 
     form = LoginForm(request.form)   # 实例化表单类
@@ -49,7 +50,7 @@ def login():
         password_candidate = request.form['password']
         sql = "SELECT * FROM users WHERE username = '%s'" % (username)  # 根据提交的用户名查询user数据库中的数据
         db = MysqlUtil()  # 实例化数据库
-        result = db.fetchone()  # 获取一条记录
+        result = db.fetchone(sql)  # 获取一条记录
         password = sha256_crypt.encrypt(result['password'])  # 用户保存于数据库中的密码
         if sha256_crypt.verify(password_candidate, password):  # 用户输入的密码与数据库中的密码做对比
             # 把相应参数写入session中
@@ -65,7 +66,7 @@ def login():
 # 用户注册
 @app.route('/register', methods=['GET','POST'])
 def register():
-    if logged_in in session:    # 如果用户已登录，直接跳转到控制台
+    if "logged_in" in session:    # 如果用户已登录，直接跳转到控制台
         return redirect(url_for('dashboard'))
 
     form = RegisterForm(request.form)  # 实例化注册表单
@@ -80,6 +81,7 @@ def register():
             sql = "INSERT INTO users(username,email,password) VALUES ('%s','%s','%s')" % \
                 (username, email, password_candidate)  # 把用户信息输入到数据库
             db.insert(sql)
+            flash('注册成功', 'success')
             return redirect(url_for('login'))  # 跳转到登录页面
         else:
             flash('两次密码不相同！','danger')  # 闪存消息
@@ -109,7 +111,7 @@ def logout():
 @app.route('/dashboard')
 @is_logged_in
 def dashboard():
-    db = MsqlUtil()
+    db = MysqlUtil()
     # 根据作者名称去查询数据库中articles中数据，按照创建日期排序
     sql = "SELECT * FROM articles WHERE author = '%s' ORDER BY create_date DESC" % session['username']
     results = db.fetchall(sql)   # 接收所有的查询记录
@@ -117,19 +119,19 @@ def dashboard():
         return render_template('dashboard.html', articles=results)
     else:
         msg = '暂无笔记记录!'
-        return render_template('dashboard.htnl', msg=msg)
+        return render_template('dashboard.html', msg=msg)
 
 # 添加笔记
-@app.route('/add_article')
+@app.route('/add_article', methods=['GET', 'POST'])
 @is_logged_in
 def add_article():
     form = ArticleForm(request.form)  # 实例化articles表单
-    if request.method == 'post' and form.validate():   # 判断输入方式以及表单验证是否通过
+    if request.method == 'POST' and form.validate():   # 判断输入方式以及表单验证是否通过
         # 获取表单中的数据
         title = form.title.data
         content = form.content.data
         author = session['username']
-        create_date = time.strftime("%Y-%m-%d %H:%M:%S",time.localtime())
+        create_date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         db = MysqlUtil()  # 实例化数据库
         sql = "INSERT INTO articles(title,content,author,create_date) \
             VALUES ('%s', '%s', '%s', '%s')" % (title, content, author, create_date)  # 插入sql语句
@@ -173,7 +175,7 @@ def edit_article(id):
 @is_logged_in
 def delete_article(id):
     db = MysqlUtil()  # 实例化数据库类
-    sql = "DELETE FROM aeticles WHERE id = '%s' and author = '%s'" % (id, session['username'])
+    sql = "DELETE FROM articles WHERE id = '%s' and author = '%s'" % (id, session['username'])
     db.delete(sql)  # 删除数据库中相应的数据
     flash('删除成功!', 'success')
     return redirect(url_for('dashboard'))  # 跳转到控制台
@@ -190,6 +192,7 @@ def page_not_found():
 if __name__ == "__main__":
     app.secret_key = "key123456"
     app.run(debug=True)
+
 
 
 

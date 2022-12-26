@@ -51,34 +51,39 @@ class RegisterForm(FlaskForm):
         '用户名',
         validators=[
             DataRequired(message='请输入用户名'),
-            Length(min=2, max=25, message='长度在2~25个字符之间')
+            Length(min=2, max=25, message='长度在4-25个字符之间')
+        ]
+    )
+    email = StringField(
+        '邮箱',
+        validators=[
+            DataRequired(message='请输入电子邮箱'),
+            Length(min=2, max=25, message='长度在4-25个字符之间')
         ]
     )
     password = PasswordField(
         '密码',
         validators=[
             DataRequired(message='密码不能为空'),
-            Length(min=6, max=25, message='长度在6~25个字符之间')
+            Length(min=6, max=20, message='长度在6-20个字符之间'),
         ]
     )
     re_password = PasswordField(
-        '密码',
+        '确认密码',
         validators=[
             DataRequired(message='密码不能为空'),
-            Length(min=6, max=25, message='长度在6~25个字符之间')
+            Length(min=6, max=20, message='长度在6-20个字符之间'),
         ]
     )
-
-    def validate_username(self, feild):
-        # 根据用户名查询用户输入名称是否重名
-        sql = "SELECT * FROM users WHERE username = '%s'" % (feild.data)
-        db = MysqlUtil()   # 实例化数据库类
-        result = db.fetchone(sql)  # 接收查询结果
+    def validate_username(self,field):
+        sql = "SELECT * FROM users  WHERE username = '%s'" % (field.data) # 根据用户名查找user表中记录
+        db = MysqlUtil() # 实例化数据库操作类
+        result = db.fetchone(sql) # 获取一条记录
         if not result:
-            flash('用户名可用', 'success')   # 闪存消息
+            flash('用户名可用！', 'success') # 闪存信息
         else:
-            raise ValidationError("用户名不可用!")  # 抛出错误
-
+            # flash('用户名不可用！', 'danger')  # 闪存信息
+            raise ValidationError("用户名不可用！")
 
 
 
