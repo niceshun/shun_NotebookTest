@@ -1,0 +1,188 @@
+11:59 2022/12/1整个博客系统分为两个板块：用户管理板块；博客管理板块
+
+一、用户管理板块：
+1.注册
+2.登录
+3.退出
+4.权限管理
+
+博客管理板块：
+1.文章列表
+2.创建文章
+3.编辑文章
+4.删除文章
+
+二、整个系统的业务流程：
+       用户允许在主页面浏览博客，可提供相关选项给用户选择是否注册登录等方式，当用户选择登录时，
+正确登录可给权限管理用户自己的博客，可选择实现增删查改等操作，也可选择退出操作界面！
+
+三、系统开发必备
+       开发工具：Pycharm
+       数据库：Mysql+PyMysql
+       web数据框架：Flask
+       第三方模块：WTforms、passlib
+
+四、数据库设计
+4.1  创建数据表
+       在Navicat可直接创建可视化的数据表。
+       在终端操作：
+1.使用命令：mysql -uroot -p*****可登录mysql数据库（*****为创建数据库时的密码）
+2.使用命令：create database notebooktest default character set utf8；创建数据库notebooktest
+3.在数据库中创建users表和articles表
+users表：用于存储用户信息
+articles表：应用于存储博客信息
+创建表的SQL语句如下：
+DROP TABLE IF EXISTS users;
+CREATE TABLE users(
+    id int(8) NOT NULL AUTO_INCREMENT,
+    username varchar(255) DEFAULT NULL,
+    email varchar(255) DEFAULT NULL,
+    password varchar(255) DEFAULT NULL,
+    PRIMARY KEY (id)
+)   ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS articles;
+CREATE TABLE articles(
+    id int(8) NOT NULL AUTO_INCREMENT,
+    title varchar(255) DEFAULT NULL,
+    content text,
+    author varchar(255) DEFAULT NULL,
+    create_date datetime DEFAULT NULL,
+    PRIMARY KEY (id)
+)   ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+五、用户模块设计
+5.1 用户登录功能实现
+    点击登录按钮，渲染页面，显示登录页面，验证表单，验证不通过，返回登录页面，验证通过，
+进入用户界面。
+5.2 用户退出功能实现
+    点击退出按钮，检测是否处于登录状态，处于则退出页面，返回主页面
+5.3 用户注册功能实现
+    点击注册按钮，检测是否处于登录状态，处于则进入控制台，不处于则显示注册页面，验证表单数据，
+验证通过则存储用户数据，并返回登录页面
+
+六、博客模块的实现
+6.1 博客列表功能实现
+    在控制台程序中，先确认是否登录，处于登录状态，再查询用户所保存的博客，如果没有之前未缓存博客，
+则显示暂无博客，有则显示控制台页面。
+6.2 添加博客功能实现
+    点击添加按钮，先确认是否登录，处于登录状态再实现添加数据进入数据库，并渲染控制台页面
+6.3 编辑博客功能实现
+    点击编辑按钮，先确认是否登录，处于登录状态再实现修改数据库数据，并渲染控制台页面
+6.4 删除博客功能实现
+    点击删除按钮，先确认是否登录，处于登录状态再实现删除对应id的数据库数据，并渲染控制台页面
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
